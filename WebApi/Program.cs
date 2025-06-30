@@ -15,6 +15,8 @@ using Microsoft.OpenApi.Models;
 
 var builder = WebApplication.CreateBuilder(args);
 
+var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
+
 // Add services to the container.
 // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
 builder.Services.AddControllers();
@@ -22,12 +24,14 @@ builder.Services.AddAutoMapper(typeof(InfrastructureProfile));
 
 builder.Services.AddScoped<IProductService, ProductService>();
 builder.Services.AddScoped<IBaseRepository<Product, int>, ProductRepository>();
+builder.Services.AddScoped<IBaseRepository<Category, int>, CategoryRepository>();
+builder.Services.AddScoped<ICategoryService, CategoryService>();
 // builder.Services.AddScoped<IAuthService, AuthService>();
 builder.Services.AddScoped<IRedisCacheService, RedisCacheService>();
 // builder.Services.AddScoped<IEmailService, EmailService>();
 
-builder.Services.AddDbContext<DataContext>(opt =>
-    opt.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection")));
+builder.Services.AddDbContext<DataContext>(options =>
+    options.UseSqlite(connectionString));
 
 builder.Services.AddStackExchangeRedisCache(options =>
 {
