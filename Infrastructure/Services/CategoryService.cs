@@ -12,10 +12,11 @@ namespace Infrastructure.Services;
 
 public class CategoryService(IBaseRepository<Category, int> categoryRepository, IMapper mapper, ILogger<ProductService> logger, IRedisCacheService redisCacheService) : ICategoryService
 {
+    private const string CacheKey = "myapp_Categories";
+
      public async Task<Response<List<CategoryDto>>> GetAllAsync(CategoryFilter filter)
     {
-        const string cacheKey = "Categories";
-        var categoriesInCache = await redisCacheService.GetData<List<CategoryDto>>(cacheKey);
+        var categoriesInCache = await redisCacheService.GetData<List<CategoryDto>>(CacheKey);
 
         if (categoriesInCache == null)
         {
@@ -35,7 +36,7 @@ public class CategoryService(IBaseRepository<Category, int> categoryRepository, 
                 }).ToList()
             }).ToList();
 
-            await redisCacheService.SetData(cacheKey, categoriesInCache, 10);
+            await redisCacheService.SetData(CacheKey, categoriesInCache, 10);
         }
 
         if (!string.IsNullOrEmpty(filter.Name))
@@ -74,7 +75,7 @@ public class CategoryService(IBaseRepository<Category, int> categoryRepository, 
 
         var mapped = mapper.Map<CategoryDto>(category);
 
-        await redisCacheService.RemoveData("Categories");
+        await redisCacheService.RemoveData(CacheKey);
 
         return result == 0
             ? new Response<CategoryDto>(HttpStatusCode.BadRequest, "Category not created")
@@ -98,7 +99,7 @@ public class CategoryService(IBaseRepository<Category, int> categoryRepository, 
 
         var mapped = mapper.Map<CategoryDto>(existing);
 
-        await redisCacheService.RemoveData("Categories");
+        await redisCacheService.RemoveData(CacheKey);
 
         return result == 0
             ? new Response<CategoryDto>(HttpStatusCode.BadRequest, "Category not updated")
@@ -118,7 +119,7 @@ public class CategoryService(IBaseRepository<Category, int> categoryRepository, 
 
         var result = await categoryRepository.DeleteAsync(category);
 
-        await redisCacheService.RemoveData("Categories");
+        await redisCacheService.RemoveData(CacheKey);
 
         return result == 0
             ? new Response<string>(HttpStatusCode.BadRequest, "Category not deleted")

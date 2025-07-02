@@ -11,11 +11,11 @@ namespace Infrastructure.Services;
 
 public class ProductService(IBaseRepository<Product, int> productRepository, IMapper mapper, ILogger<ProductService> logger, IRedisCacheService redisCacheService) : IProductService
 {
+    private const string CacheKey = "myapp_Products";
     public async Task<Response<List<ProductDto>>> GetAllAsync(ProductFilter filter)
     {
-        const string cacheKey = "Products";
         var validFilter = new ValidFilter(filter.PageNumber, filter.PageSize);
-        var productsInCache = await redisCacheService.GetData<List<ProductDto>>(cacheKey);
+        var productsInCache = await redisCacheService.GetData<List<ProductDto>>(CacheKey);
 
         if (productsInCache == null)
         {
@@ -35,7 +35,7 @@ public class ProductService(IBaseRepository<Product, int> productRepository, IMa
                 CategoryName = p.Category.Name
             }).ToList();
 
-            await redisCacheService.SetData(cacheKey, productsInCache, 10);
+            await redisCacheService.SetData(CacheKey, productsInCache, 10);
         }
 
         if (!string.IsNullOrEmpty(filter.Name))
@@ -93,7 +93,7 @@ public class ProductService(IBaseRepository<Product, int> productRepository, IMa
 
         var dto = mapper.Map<ProductDto>(product);
 
-        await redisCacheService.RemoveData("Products");
+        await redisCacheService.RemoveData(CacheKey);
 
         return result == 0
             ? new Response<ProductDto>(HttpStatusCode.BadRequest, "Product not created")
@@ -124,7 +124,7 @@ public class ProductService(IBaseRepository<Product, int> productRepository, IMa
 
         var dto = mapper.Map<ProductDto>(existingProduct);
 
-        await redisCacheService.RemoveData("Products");
+        await redisCacheService.RemoveData(CacheKey);
 
         return result == 0
             ? new Response<ProductDto>(HttpStatusCode.BadRequest, "Product not updated")
@@ -144,7 +144,7 @@ public class ProductService(IBaseRepository<Product, int> productRepository, IMa
 
         var result = await productRepository.DeleteAsync(product);
 
-        await redisCacheService.RemoveData("Products");
+        await redisCacheService.RemoveData(CacheKey);
 
         return result == 0
             ? new Response<string>(HttpStatusCode.BadRequest, "Product not deleted")
