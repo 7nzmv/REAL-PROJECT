@@ -137,7 +137,7 @@ builder.Services.AddSwaggerGen(options =>
 
 
 
-// builder.Services.AddAuthorization();
+builder.Services.AddAuthorization();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
