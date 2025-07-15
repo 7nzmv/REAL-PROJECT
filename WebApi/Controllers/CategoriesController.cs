@@ -28,21 +28,21 @@ public class CategoriesController(ICategoryService categoryService) : Controller
     }
 
     [HttpPut("{id}")]
-    // [Authorize(Roles = Roles.Admin)]
+    [Authorize(Roles = Roles.Admin)]
     public async Task<Response<CategoryDto>> UpdateAsync(int id, [FromBody] UpdateCategoryDto updateCategoryDto)
     {
         return await categoryService.UpdateAsync(id, updateCategoryDto);
     }
 
     [HttpDelete("{id}")]
-    // [Authorize(Roles = Roles.Admin)]
+    [Authorize(Roles = Roles.Admin)]
     public async Task<Response<string>> DeleteAsync(int id)
     {
         return await categoryService.DeleteAsync(id);
     }
 
     [HttpPost]
-    // [Authorize(Roles = Roles.Admin)]
+    [Authorize(Roles = Roles.Admin)]
     public async Task<Response<CategoryDto>> CreateAsync(CreateCategoryDto categoryDto)
     {
         return await categoryService.CreateAsync(categoryDto);

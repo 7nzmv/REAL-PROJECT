@@ -16,7 +16,7 @@ public class OrdersController(IOrderService orderService) : ControllerBase
 {
 
     [HttpGet]
-    // [Authorize(Roles = Roles.Admin)]
+    [Authorize(Roles = Roles.Admin)]
     public async Task<Response<List<OrderDto>>> GetAllAsync([FromQuery] OrderFilter filter)
     {
         return await orderService.GetAllAsync(filter);
@@ -24,14 +24,14 @@ public class OrdersController(IOrderService orderService) : ControllerBase
 
 
     [HttpGet("{id}")]
-    // [Authorize(Roles = Roles.Admin)]
+    [Authorize(Roles = Roles.Admin)]
     public async Task<Response<OrderDto>> GetByIdAsync(int id)
     {
         return await orderService.GetByIdAsync(id);
     }
 
     [HttpPut("{id}")]
-    // [Authorize]
+    [Authorize]
     public async Task<Response<OrderDto>> UpdateAsync(int id, [FromBody] UpdateOrderDto updateOrderDto)
     {
         var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
@@ -43,7 +43,7 @@ public class OrdersController(IOrderService orderService) : ControllerBase
 
 
     [HttpDelete("{id}")]
-    // [Authorize]
+    [Authorize]
     public async Task<Response<string>> DeleteAsync(int id)
     {
         var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
@@ -54,7 +54,7 @@ public class OrdersController(IOrderService orderService) : ControllerBase
     }
 
     [HttpPost]
-    // [Authorize]
+    [Authorize]
     public async Task<Response<OrderDto>> CreateAsync([FromBody] CreateOrderDto orderDto)
     {
         var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;

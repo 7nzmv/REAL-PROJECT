@@ -14,7 +14,7 @@ public class CartItemsController(ICartItemService cartItemService) : ControllerB
 {
     // получить все элементы корзины пользователя (текущего)
     [HttpGet]
-    // [Authorize]
+    [Authorize]
     public async Task<Response<List<CartItemDto>>> GetAllByUserAsync()
     {
         // var userId = User.Identity?.Name;
@@ -27,7 +27,7 @@ public class CartItemsController(ICartItemService cartItemService) : ControllerB
 
     // получить элемент корзины по id (у пользователя)
     [HttpGet("{id}")]
-    // [Authorize]
+    [Authorize]
     public async Task<Response<CartItemDto>> GetByIdAsync(int id)
     {
         return await cartItemService.GetByIdAsync(id);
@@ -35,7 +35,7 @@ public class CartItemsController(ICartItemService cartItemService) : ControllerB
 
     // добавить товар в корзину
     [HttpPost]
-    // [Authorize]
+    [Authorize]
     public async Task<Response<CartItemDto>> CreateAsync([FromBody] CreateCartItemDto dto)
     {
         // var userId = User.Identity?.Name;
@@ -48,7 +48,7 @@ public class CartItemsController(ICartItemService cartItemService) : ControllerB
 
     // обновить количество товара в корзине
     [HttpPut("{id}")]
-    // [Authorize]
+    [Authorize]
     public async Task<Response<CartItemDto>> UpdateAsync(int id, [FromBody] UpdateCartItemDto dto)
     {
         // var userId = User.Identity?.Name;
@@ -61,7 +61,7 @@ public class CartItemsController(ICartItemService cartItemService) : ControllerB
 
     // удалить товар из корзины
     [HttpDelete("{id}")]
-    // [Authorize]
+    [Authorize]
     public async Task<Response<string>> DeleteAsync(int id)
     {
         // var userId = User.Identity?.Name;
