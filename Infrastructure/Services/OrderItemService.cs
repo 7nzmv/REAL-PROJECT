@@ -7,7 +7,7 @@ using Infrastructure.Interfaces;
 using Microsoft.Extensions.Logging;
 
 public class OrderItemService(
-    IBaseRepository<OrderItem, int> orderItemRepository,
+    IBaseRepositoryWithInclude<OrderItem, int> orderItemRepository,
     IBaseRepository<Product, int> productRepository,
     IBaseRepository<Order, int> orderRepository,
     IMapper mapper,
@@ -23,13 +23,13 @@ public class OrderItemService(
         if (order == null)
             return new Response<List<OrderItemDto>>(HttpStatusCode.NotFound, "Order not found");
 
-        var items = await orderItemRepository.GetAllAsync();
+        var items = await orderItemRepository.GetAllIncludingAsync(i => i.Product);
         var filteredItems = items.Where(i => i.OrderId == orderId).ToList();
 
         var dtos = filteredItems.Select(i =>
         {
             var dto = mapper.Map<OrderItemDto>(i);
-            dto.ProductName = i.Product.Name; // Подтянуть имя продукта
+            dto.ProductName = i.Product.Name;
             return dto;
         }).ToList();
 
@@ -38,7 +38,7 @@ public class OrderItemService(
 
     public async Task<Response<OrderItemDto>> GetByIdAsync(int id)
     {
-        var item = await orderItemRepository.GetByIdAsync(id);
+        var item = await orderItemRepository.GetByIdIncludingAsync(id, x => x.Product);
         if (item == null)
             return new Response<OrderItemDto>(HttpStatusCode.NotFound, "Order item not found");
 
@@ -47,6 +47,8 @@ public class OrderItemService(
 
         return new Response<OrderItemDto>(dto);
     }
+
+
 
     public async Task<Response<OrderItemDto>> CreateAsync(CreateOrderItemDto dto, int orderId, string userId)
     {

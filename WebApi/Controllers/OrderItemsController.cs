@@ -1,3 +1,4 @@
+using System.Security.Claims;
 using Domain.Constants;
 using Domain.DTOs.OrderItem;
 using Domain.Responses;
@@ -12,24 +13,24 @@ namespace WebApi.Controllers;
 public class OrderItemsController(IOrderItemService orderItemService) : ControllerBase
 {
     [HttpGet]
-    [Authorize(Roles = Roles.Admin)]
+    // [Authorize(Roles = Roles.Admin)]
     public async Task<Response<List<OrderItemDto>>> GetAllAsync([FromQuery] int orderId)
     {
         return await orderItemService.GetAllAsync(orderId);
     }
 
     [HttpGet("{id}")]
-    [Authorize]
+    // [Authorize]
     public async Task<Response<OrderItemDto>> GetByIdAsync(int id)
     {
         return await orderItemService.GetByIdAsync(id);
     }
 
     [HttpPost("{orderId}")]
-    [Authorize]
+    // [Authorize]
     public async Task<Response<OrderItemDto>> CreateAsync(int orderId, [FromBody] CreateOrderItemDto createDto)
     {
-        var userId = User.Identity?.Name;
+        var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
         if (string.IsNullOrEmpty(userId))
             return new Response<OrderItemDto>(System.Net.HttpStatusCode.Unauthorized, "User not authorized");
 
@@ -38,10 +39,11 @@ public class OrderItemsController(IOrderItemService orderItemService) : Controll
 
 
     [HttpPut("{id}")]
-    [Authorize]
+    // [Authorize]
     public async Task<Response<OrderItemDto>> UpdateAsync(int id, [FromBody] UpdateOrderItemDto updateDto)
     {
-        var userId = User.Identity?.Name;
+        // var userId = User.Identity?.Name;
+        var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
         if (string.IsNullOrEmpty(userId))
             return new Response<OrderItemDto>(System.Net.HttpStatusCode.Unauthorized, "User not authorized");
 
@@ -50,10 +52,11 @@ public class OrderItemsController(IOrderItemService orderItemService) : Controll
 
 
     [HttpDelete("{id}")]
-    [Authorize]
+    // [Authorize]
     public async Task<Response<string>> DeleteAsync(int id)
     {
-        var userId = User.Identity?.Name;
+        // var userId = User.Identity?.Name;
+        var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
         if (string.IsNullOrEmpty(userId))
             return new Response<string>(System.Net.HttpStatusCode.Unauthorized, "User not authorized");
 

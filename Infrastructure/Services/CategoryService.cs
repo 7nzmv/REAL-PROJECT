@@ -14,7 +14,7 @@ public class CategoryService(IBaseRepository<Category, int> categoryRepository, 
 {
     private const string CacheKey = "myapp_Categories";
 
-     public async Task<Response<List<CategoryDto>>> GetAllAsync(CategoryFilter filter)
+    public async Task<Response<List<CategoryDto>>> GetAllAsync(CategoryFilter filter)
     {
         var categoriesInCache = await redisCacheService.GetData<List<CategoryDto>>(CacheKey);
 
@@ -61,9 +61,18 @@ public class CategoryService(IBaseRepository<Category, int> categoryRepository, 
             return new Response<CategoryDto>(HttpStatusCode.BadRequest, "Category not found");
         }
 
-        var dto = mapper.Map<CategoryDto>(category);
+        var dto = new CategoryDto
+        {
+            Id = category.Id,
+            Name = category.Name,
+            ParentCategoryId = category.ParentCategoryId,
+            ParentCategoryName = category.ParentCategory?.Name,
+            ProductCount = category.Products?.Count ?? 0,
+            SubCategories = MapCategories(category.SubCategories?.ToList() ?? new List<Category>())
+        };
 
         return new Response<CategoryDto>(dto);
+
     }
 
     public async Task<Response<CategoryDto>> CreateAsync(CreateCategoryDto dto)
@@ -73,14 +82,29 @@ public class CategoryService(IBaseRepository<Category, int> categoryRepository, 
 
         var result = await categoryRepository.AddAsync(category);
 
-        var mapped = mapper.Map<CategoryDto>(category);
+        if (result == 0)
+        {
+            return new Response<CategoryDto>(HttpStatusCode.BadRequest, "Category not created");
+        }
+
+        // получаем категорию из базы уже с навигационными данными, если надо
+        var createdCategory = await categoryRepository.GetByIdAsync(category.Id);
+
+        var mapped = new CategoryDto
+        {
+            Id = createdCategory.Id,
+            Name = createdCategory.Name,
+            ParentCategoryId = createdCategory.ParentCategoryId,
+            ParentCategoryName = createdCategory.ParentCategory?.Name,
+            ProductCount = createdCategory.Products?.Count ?? 0,
+            SubCategories = MapCategories(createdCategory.SubCategories?.ToList() ?? new List<Category>())
+        };
 
         await redisCacheService.RemoveData(CacheKey);
 
-        return result == 0
-            ? new Response<CategoryDto>(HttpStatusCode.BadRequest, "Category not created")
-            : new Response<CategoryDto>(mapped);
+        return new Response<CategoryDto>(mapped);
     }
+
 
     public async Task<Response<CategoryDto>> UpdateAsync(int id, UpdateCategoryDto dto)
     {
@@ -125,5 +149,22 @@ public class CategoryService(IBaseRepository<Category, int> categoryRepository, 
             ? new Response<string>(HttpStatusCode.BadRequest, "Category not deleted")
             : new Response<string>("Category deleted successfully");
     }
+
+    private List<CategoryDto> MapCategories(List<Category> categories, int currentDepth = 0, int maxDepth = 1)
+    {
+        if (categories == null || currentDepth >= maxDepth)
+            return new List<CategoryDto>();
+
+        return categories.Select(c => new CategoryDto
+        {
+            Id = c.Id,
+            Name = c.Name,
+            ParentCategoryId = c.ParentCategoryId,
+            ParentCategoryName = c.ParentCategory?.Name,
+            ProductCount = c.Products?.Count ?? 0,
+            SubCategories = MapCategories(c.SubCategories?.ToList() ?? new List<Category>(), currentDepth + 1, maxDepth)
+        }).ToList();
+    }
+
 }
 

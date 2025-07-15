@@ -75,13 +75,14 @@ public class OrderService(
         return new Response<OrderDto>(dto);
     }
 
-    public async Task<Response<OrderDto>> CreateAsync(CreateOrderDto createOrderDto)
+    public async Task<Response<OrderDto>> CreateAsync(CreateOrderDto createOrderDto, string userId)
     {
         logger.LogInformation("CreateAsync called with: {@Request}", createOrderDto);
 
         var order = new Order
         {
-            UserId = createOrderDto.UserId,
+            // UserId = createOrderDto.UserId,
+            UserId = userId,
             CreatedAt = DateTime.UtcNow,
             Status = OrderStatus.Pending
         };

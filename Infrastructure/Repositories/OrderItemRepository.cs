@@ -1,10 +1,12 @@
+using System.Linq.Expressions;
 using Domain.Entities;
 using Infrastructure.Data;
 using Infrastructure.Interfaces;
+using Microsoft.EntityFrameworkCore;
 
 namespace Infrastructure.Repositories;
 
-public class OrderItemRepository(DataContext context) : IBaseRepository<OrderItem, int>
+public class OrderItemRepository(DataContext context) : IBaseRepositoryWithInclude<OrderItem, int>
 {
     public async Task<int> AddAsync(OrderItem orderItem)
     {
@@ -25,6 +27,32 @@ public class OrderItemRepository(DataContext context) : IBaseRepository<OrderIte
         var orderItems = context.OrderItems.AsQueryable();
         return Task.FromResult(orderItems);
     }
+
+    public async Task<List<OrderItem>> GetAllIncludingAsync(params Expression<Func<OrderItem, object>>[] includeProperties)
+    {
+        IQueryable<OrderItem> query = context.OrderItems;
+
+        foreach (var includeProperty in includeProperties)
+        {
+            query = query.Include(includeProperty);
+        }
+
+        return await query.ToListAsync();
+    }
+
+
+    public async Task<OrderItem?> GetByIdIncludingAsync(int id, params Expression<Func<OrderItem, object>>[] includeProperties)
+    {
+        IQueryable<OrderItem> query = context.OrderItems;
+
+        foreach (var includeProperty in includeProperties)
+        {
+            query = query.Include(includeProperty);
+        }
+
+        return await query.FirstOrDefaultAsync(o => o.Id == id);
+    }
+
 
     public async Task<OrderItem?> GetByIdAsync(int id)
     {

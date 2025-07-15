@@ -16,6 +16,13 @@ using Microsoft.OpenApi.Models;
 
 var builder = WebApplication.CreateBuilder(args);
 
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("AllowAll", policy =>
+        policy.AllowAnyOrigin()
+              .AllowAnyMethod()
+              .AllowAnyHeader());
+});
 
 var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
 
@@ -38,6 +45,9 @@ builder.Services.AddScoped<IOrderItemService, OrderItemService>();
 builder.Services.AddScoped<IBaseRepository<OrderItem, int>, OrderItemRepository>();
 builder.Services.AddScoped<ICartItemService, CartItemService>();
 builder.Services.AddScoped<IBaseRepository<CartItem, int>, CartItemRepository>();
+builder.Services.AddScoped<IBaseRepositoryWithInclude<OrderItem, int>, OrderItemRepository>();
+builder.Services.AddScoped<IBaseRepositoryWithInclude<CartItem, int>, CartItemRepository>();
+
 
 
 builder.Services.AddDbContext<DataContext>(options =>
@@ -163,7 +173,7 @@ if (app.Environment.IsDevelopment())
 app.UseHttpsRedirection();
 app.UseRouting();
 app.UseAuthentication();
-app.UseCors();
+app.UseCors("AllowAll");
 app.UseAuthorization();
 app.MapControllers();
 app.Run();

@@ -20,7 +20,7 @@ public class AuthService(
 {
     public async Task<Response<TokenDto>> Login(LoginDto loginDto)
     {
-        var user = await userManager.FindByNameAsync(loginDto.Email);
+        var user = await userManager.FindByEmailAsync(loginDto.Email);
         if (user == null)
         {
             return new Response<TokenDto>(HttpStatusCode.BadRequest, "Username or password is incorrect");

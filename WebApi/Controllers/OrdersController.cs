@@ -1,4 +1,5 @@
 using System.Net;
+using System.Security.Claims;
 using Domain.Constants;
 using Domain.DTOs.Order;
 using Domain.Filtres;
@@ -15,7 +16,7 @@ public class OrdersController(IOrderService orderService) : ControllerBase
 {
 
     [HttpGet]
-    [Authorize(Roles = Roles.Admin)]
+    // [Authorize(Roles = Roles.Admin)]
     public async Task<Response<List<OrderDto>>> GetAllAsync([FromQuery] OrderFilter filter)
     {
         return await orderService.GetAllAsync(filter);
@@ -23,17 +24,17 @@ public class OrdersController(IOrderService orderService) : ControllerBase
 
 
     [HttpGet("{id}")]
-    [Authorize(Roles = Roles.Admin)]
+    // [Authorize(Roles = Roles.Admin)]
     public async Task<Response<OrderDto>> GetByIdAsync(int id)
     {
         return await orderService.GetByIdAsync(id);
     }
 
     [HttpPut("{id}")]
-    [Authorize]
+    // [Authorize]
     public async Task<Response<OrderDto>> UpdateAsync(int id, [FromBody] UpdateOrderDto updateOrderDto)
     {
-        var userId = User.Identity?.Name;
+        var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
         if (string.IsNullOrEmpty(userId))
             return new Response<OrderDto>(HttpStatusCode.Unauthorized, "User not authorized");
 
@@ -42,10 +43,10 @@ public class OrdersController(IOrderService orderService) : ControllerBase
 
 
     [HttpDelete("{id}")]
-    [Authorize]
+    // [Authorize]
     public async Task<Response<string>> DeleteAsync(int id)
     {
-        var userId = User.Identity?.Name;
+        var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
         if (string.IsNullOrEmpty(userId))
             return new Response<string>(HttpStatusCode.Unauthorized, "User not authorized");
 
@@ -53,10 +54,14 @@ public class OrdersController(IOrderService orderService) : ControllerBase
     }
 
     [HttpPost]
-    [Authorize]
-    public async Task<Response<OrderDto>> CreateAsync(CreateOrderDto orderDto)
+    // [Authorize]
+    public async Task<Response<OrderDto>> CreateAsync([FromBody] CreateOrderDto orderDto)
     {
-        return await orderService.CreateAsync(orderDto);
+        var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+        if (string.IsNullOrEmpty(userId))
+            return new Response<OrderDto>(HttpStatusCode.Unauthorized, "User not authorized");
+
+        return await orderService.CreateAsync(orderDto, userId);
     }
 
 }

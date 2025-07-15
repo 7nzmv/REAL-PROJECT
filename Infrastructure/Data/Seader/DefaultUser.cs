@@ -21,7 +21,7 @@ public class DefaultUser
             return;
         }
 
-        var result = await userManager.CreateAsync(user, "motylek1717");
+        var result = await userManager.CreateAsync(user, "Motylek1718!");
         if (result.Succeeded)
         {
             await userManager.AddToRoleAsync(user, Roles.Admin);

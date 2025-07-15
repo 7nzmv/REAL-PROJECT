@@ -9,7 +9,7 @@ using Microsoft.Extensions.Logging;
 namespace Infrastructure.Services;
 
 public class CartItemService(
-    IBaseRepository<CartItem, int> cartItemRepository,
+    IBaseRepositoryWithInclude<CartItem, int> cartItemRepository,
     IBaseRepository<Product, int> productRepository,
     IMapper mapper,
     ILogger<CartItemService> logger,
@@ -28,13 +28,13 @@ public class CartItemService(
             return new Response<List<CartItemDto>>(cachedItems);
         }
 
-        var items = await cartItemRepository.GetAllAsync();
+        var items = await cartItemRepository.GetAllIncludingAsync(x => x.Product);
         var userItems = items.Where(ci => ci.UserId == userId).ToList();
 
         var mapped = userItems.Select(ci =>
         {
             var dto = mapper.Map<CartItemDto>(ci);
-            dto.ProductName = ci.Product.Name; // если Product загружен через Include
+            dto.ProductName = ci.Product.Name;
             return dto;
         }).ToList();
 
@@ -45,7 +45,7 @@ public class CartItemService(
 
     public async Task<Response<CartItemDto>> GetByIdAsync(int id)
     {
-        var item = await cartItemRepository.GetByIdAsync(id);
+        var item = await cartItemRepository.GetByIdIncludingAsync(id, x => x.Product);
         if (item == null)
         {
             return new Response<CartItemDto>(HttpStatusCode.NotFound, "Cart item not found");
@@ -100,7 +100,7 @@ public class CartItemService(
 
     public async Task<Response<CartItemDto>> UpdateAsync(int id, UpdateCartItemDto dto, string userId)
     {
-        var item = await cartItemRepository.GetByIdAsync(id);
+        var item = await cartItemRepository.GetByIdIncludingAsync(id, x => x.Product);
         if (item == null || item.UserId != userId)
         {
             return new Response<CartItemDto>(HttpStatusCode.NotFound, "Cart item not found or access denied");

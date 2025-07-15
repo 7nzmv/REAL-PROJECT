@@ -1,4 +1,8 @@
 using AutoMapper;
+using Domain.DTOs.CartItem;
+using Domain.DTOs.Category;
+using Domain.DTOs.Order;
+using Domain.DTOs.OrderItem;
 using Domain.DTOs.Product;
 using Domain.Entities;
 
@@ -10,7 +14,18 @@ public class InfrastructureProfile : Profile
     {
         CreateMap<CreateProductDto, Product>();
         CreateMap<Product, ProductDto>();
-        
+
+        CreateMap<CreateCategoryDto, Category>();
+        CreateMap<Category, CategoryDto>();
+
+        CreateMap<CreateOrderDto, Order>();
+        CreateMap<Order, OrderDto>();
+        CreateMap<OrderItem, OrderItemDto>();
+
+        CreateMap<CreateCartItemDto, CartItem>();
+        CreateMap<CartItem, CartItemDto>()
+    .ForMember(dest => dest.ProductName,
+               opt => opt.MapFrom(src => src.Product.Name));
 
     }
 
