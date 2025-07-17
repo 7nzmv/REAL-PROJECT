@@ -10,6 +10,8 @@ public class Category
     [Required]
     [MaxLength(100)]
     public string Name { get; set; } = null!;           // например: Спальня
+    public string? ImageUrl { get; set; }
+
     public int? ParentCategoryId { get; set; }          // для вложенных категорий (например, "Кровати" внутри "Спальни")
 
     public Category? ParentCategory { get; set; }

@@ -147,6 +147,7 @@ builder.Services.AddSwaggerGen(options =>
 
 
 
+
 builder.Services.AddAuthorization();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
@@ -170,6 +171,7 @@ if (app.Environment.IsDevelopment())
     app.UseSwaggerUI();
 }
 
+app.UseStaticFiles(); // обязательно
 app.UseHttpsRedirection();
 app.UseRouting();
 app.UseAuthentication();

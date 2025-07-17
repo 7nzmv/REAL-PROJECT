@@ -96,6 +96,7 @@ public class CategoryService(IBaseRepository<Category, int> categoryRepository, 
             Name = createdCategory.Name,
             ParentCategoryId = createdCategory.ParentCategoryId,
             ParentCategoryName = createdCategory.ParentCategory?.Name,
+            ImageUrl = createdCategory.ImageUrl,
             ProductCount = createdCategory.Products?.Count ?? 0,
             SubCategories = MapCategories(createdCategory.SubCategories?.ToList() ?? new List<Category>())
         };
@@ -118,6 +119,8 @@ public class CategoryService(IBaseRepository<Category, int> categoryRepository, 
 
         existing.Name = dto.Name;
         existing.ParentCategoryId = dto.ParentCategoryId;
+        existing.ImageUrl = dto.ImageUrl;
+
 
         var result = await categoryRepository.UpdateAsync(existing);
 
@@ -162,6 +165,7 @@ public class CategoryService(IBaseRepository<Category, int> categoryRepository, 
             ParentCategoryId = c.ParentCategoryId,
             ParentCategoryName = c.ParentCategory?.Name,
             ProductCount = c.Products?.Count ?? 0,
+            ImageUrl = c.ImageUrl,
             SubCategories = MapCategories(c.SubCategories?.ToList() ?? new List<Category>(), currentDepth + 1, maxDepth)
         }).ToList();
     }

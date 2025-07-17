@@ -1,12 +1,20 @@
 {
   "Version": 1,
-  "Hash": "3fzD1EelHVW7I8sZnXbFvVts4pyDK1lx9zGyE0YOAsI=",
+  "Hash": "8dfqmPhXtK/xOPb5nUBwFP/7pHmMg/JFE9jR/LtFtdE=",
   "Source": "WebApi",
   "BasePath": "_content/WebApi",
   "Mode": "Default",
   "ManifestType": "Build",
   "ReferencedProjectsConfiguration": [],
-  "DiscoveryPatterns": [],
+  "DiscoveryPatterns": [
+    {
+      "Name": "WebApi\\wwwroot",
+      "Source": "WebApi",
+      "ContentRoot": "C:\\Users\\user\\Desktop\\REAL PROJECT\\WebApi\\wwwroot\\",
+      "BasePath": "_content/WebApi",
+      "Pattern": "**"
+    }
+  ],
   "Assets": [],
   "Endpoints": []
 }
