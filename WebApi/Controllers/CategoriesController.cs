@@ -12,7 +12,7 @@ namespace WebApi.Controllers;
 
 [ApiController]
 [Route("api/[controller]")]
-public class CategoriesController(ICategoryService categoryService) : ControllerBase
+public class CategoriesController(ICategoryService categoryService, IWebHostEnvironment environment) : ControllerBase
 {
 
     [HttpGet]
@@ -57,18 +57,29 @@ public class CategoriesController(ICategoryService categoryService) : Controller
         if (file == null || file.Length == 0)
             return BadRequest("Файл не выбран");
 
-        var filePath = Path.Combine("wwwroot/uploads", file.FileName);
+        // получаем путь к wwwroot/uploads
+        var uploadsFolder = Path.Combine(environment.WebRootPath, "uploads");
 
-        Directory.CreateDirectory("wwwroot/uploads"); // если директории нет
+        // создаём папку, если её нет
+        Directory.CreateDirectory(uploadsFolder);
+
+        // формируем безопасное имя файла (убираем пробелы и запрещённые символы)
+        var fileName = Path.GetFileName(file.FileName).Replace(" ", "_");
+
+        var filePath = Path.Combine(uploadsFolder, fileName);
+
+        // сохраняем файл
         using (var stream = new FileStream(filePath, FileMode.Create))
         {
             await file.CopyToAsync(stream);
         }
 
-        var imageUrl = $"{Request.Scheme}://{Request.Host}/uploads/{file.FileName}";
+        // формируем url для доступа к файлу
+        var imageUrl = $"{Request.Scheme}://{Request.Host}/uploads/{fileName}";
 
-        return Ok(new { Url = imageUrl });
+        return Ok(new { url = imageUrl });
     }
+
 
 }
 
