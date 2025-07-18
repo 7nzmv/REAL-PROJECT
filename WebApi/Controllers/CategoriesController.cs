@@ -50,36 +50,28 @@ public class CategoriesController(ICategoryService categoryService, IWebHostEnvi
     }
 
     [HttpPost("upload-image")]
-    public async Task<IActionResult> UploadImage([FromForm] UploadImageDto dto)
+    public async Task<IActionResult> UploadImage([FromForm] UploadImageDto dto, [FromServices] IWebHostEnvironment environment)
     {
         var file = dto.File;
 
         if (file == null || file.Length == 0)
             return BadRequest("Файл не выбран");
 
-        // получаем путь к wwwroot/uploads
         var uploadsFolder = Path.Combine(environment.WebRootPath, "uploads");
-
-        // создаём папку, если её нет
         Directory.CreateDirectory(uploadsFolder);
 
-        // формируем безопасное имя файла (убираем пробелы и запрещённые символы)
         var fileName = Path.GetFileName(file.FileName).Replace(" ", "_");
-
         var filePath = Path.Combine(uploadsFolder, fileName);
 
-        // сохраняем файл
         using (var stream = new FileStream(filePath, FileMode.Create))
         {
             await file.CopyToAsync(stream);
         }
 
-        // формируем url для доступа к файлу
-        var imageUrl = $"{Request.Scheme}://{Request.Host}/uploads/{fileName}";
+        var imageUrl = $"{Request.Scheme}://{Request.Host}/uploads/{Uri.EscapeDataString(fileName)}";
 
         return Ok(new { url = imageUrl });
     }
-
 
 }
 
