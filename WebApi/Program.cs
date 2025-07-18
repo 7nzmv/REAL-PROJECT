@@ -47,6 +47,8 @@ builder.Services.AddScoped<ICartItemService, CartItemService>();
 builder.Services.AddScoped<IBaseRepository<CartItem, int>, CartItemRepository>();
 builder.Services.AddScoped<IBaseRepositoryWithInclude<OrderItem, int>, OrderItemRepository>();
 builder.Services.AddScoped<IBaseRepositoryWithInclude<CartItem, int>, CartItemRepository>();
+builder.Services.AddScoped<IStatisticsService, StatisticsService>();
+
 
 
 

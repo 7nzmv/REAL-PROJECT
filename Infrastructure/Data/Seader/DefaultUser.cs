@@ -26,6 +26,6 @@ public class DefaultUser
         {
             await userManager.AddToRoleAsync(user, Roles.Admin);
         }
-    }
+    } 
 }
 
