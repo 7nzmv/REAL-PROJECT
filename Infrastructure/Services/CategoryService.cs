@@ -75,10 +75,43 @@ public class CategoryService(IBaseRepository<Category, int> categoryRepository, 
 
     }
 
+    // public async Task<Response<CategoryDto>> CreateAsync(CreateCategoryDto dto)
+    // {
+    //     logger.LogInformation("CreateAsync called with: {@Request}", dto);
+    //     var category = mapper.Map<Category>(dto);
+
+    //     var result = await categoryRepository.AddAsync(category);
+
+    //     if (result == 0)
+    //     {
+    //         return new Response<CategoryDto>(HttpStatusCode.BadRequest, "Category not created");
+    //     }
+
+    //     // получаем категорию из базы уже с навигационными данными, если надо
+    //     var createdCategory = await categoryRepository.GetByIdAsync(category.Id);
+
+    //     var mapped = new CategoryDto
+    //     {
+    //         Id = createdCategory.Id,
+    //         Name = createdCategory.Name,
+    //         ParentCategoryId = createdCategory.ParentCategoryId,
+    //         ParentCategoryName = createdCategory.ParentCategory?.Name,
+    //         ImageUrl = createdCategory.ImageUrl,
+    //         ProductCount = createdCategory.Products?.Count ?? 0,
+    //         SubCategories = MapCategories(createdCategory.SubCategories?.ToList() ?? new List<Category>())
+    //     };
+
+    //     await redisCacheService.RemoveData(CacheKey);
+
+    //     return new Response<CategoryDto>(mapped);
+    // }
     public async Task<Response<CategoryDto>> CreateAsync(CreateCategoryDto dto)
     {
         logger.LogInformation("CreateAsync called with: {@Request}", dto);
         var category = mapper.Map<Category>(dto);
+
+        // Add this line to manually set the ImageUrl
+        category.ImageUrl = dto.ImageUrl;
 
         var result = await categoryRepository.AddAsync(category);
 
@@ -87,22 +120,19 @@ public class CategoryService(IBaseRepository<Category, int> categoryRepository, 
             return new Response<CategoryDto>(HttpStatusCode.BadRequest, "Category not created");
         }
 
-        // получаем категорию из базы уже с навигационными данными, если надо
         var createdCategory = await categoryRepository.GetByIdAsync(category.Id);
-
         var mapped = new CategoryDto
         {
             Id = createdCategory.Id,
             Name = createdCategory.Name,
             ParentCategoryId = createdCategory.ParentCategoryId,
             ParentCategoryName = createdCategory.ParentCategory?.Name,
-            ImageUrl = createdCategory.ImageUrl,
+            ImageUrl = createdCategory.ImageUrl, // This will now have the correct value
             ProductCount = createdCategory.Products?.Count ?? 0,
             SubCategories = MapCategories(createdCategory.SubCategories?.ToList() ?? new List<Category>())
         };
 
         await redisCacheService.RemoveData(CacheKey);
-
         return new Response<CategoryDto>(mapped);
     }
 
