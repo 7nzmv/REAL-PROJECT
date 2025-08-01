@@ -11,4 +11,6 @@ public interface IOrderService
     Task<Response<OrderDto>> CreateAsync(CreateOrderDto createOrderDto, string userId);
     Task<Response<OrderDto>> UpdateAsync(int id, UpdateOrderDto updateOrderDto, string userId);
     Task<Response<string>> DeleteAsync(int id, string userId);
+    Task<Response<List<OrderDto>>> GetArchivedOrdersAsync(OrderFilter filter);
+
 }

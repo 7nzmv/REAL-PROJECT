@@ -64,6 +64,16 @@ public class OrdersController(IOrderService orderService) : ControllerBase
         return await orderService.CreateAsync(orderDto, userId);
     }
 
+    [Authorize(Roles = Roles.Admin)]
+    [HttpGet("archived")]
+    
+    public async Task<Response<List<OrderDto>>> GetArchivedOrders([FromQuery] OrderFilter filter)
+    {
+        return await orderService.GetArchivedOrdersAsync(filter);
+    }
+
+
+
 }
 
 

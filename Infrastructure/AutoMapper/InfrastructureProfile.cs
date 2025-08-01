@@ -4,6 +4,7 @@ using Domain.DTOs.Category;
 using Domain.DTOs.Order;
 using Domain.DTOs.OrderItem;
 using Domain.DTOs.Product;
+using Domain.DTOs.Review;
 using Domain.Entities;
 
 namespace Infrastructure.AutoMapper;
@@ -26,6 +27,10 @@ public class InfrastructureProfile : Profile
         CreateMap<CartItem, CartItemDto>()
     .ForMember(dest => dest.ProductName,
                opt => opt.MapFrom(src => src.Product.Name));
+
+        CreateMap<CreateReviewDto, Review>();
+        CreateMap<Review, ReviewDto>();
+        CreateMap<UpdateReviewDto, Review>();
 
     }
 

@@ -13,8 +13,24 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
+using Microsoft.AspNetCore.Localization;
+using System.Globalization;
+using Microsoft.Extensions.Options;
+
 
 var builder = WebApplication.CreateBuilder(args);
+
+builder.Services.AddLocalization(options => options.ResourcesPath = "Resources");
+
+var supportedCultures = new[] { "ru", "tg" };
+
+builder.Services.Configure<RequestLocalizationOptions>(options =>
+{
+    options.DefaultRequestCulture = new RequestCulture("ru");
+    options.SupportedCultures = supportedCultures.Select(c => new CultureInfo(c)).ToList();
+    options.SupportedUICultures = supportedCultures.Select(c => new CultureInfo(c)).ToList();
+});
+
 
 builder.Services.AddCors(options =>
 {
@@ -48,6 +64,8 @@ builder.Services.AddScoped<IBaseRepository<CartItem, int>, CartItemRepository>()
 builder.Services.AddScoped<IBaseRepositoryWithInclude<OrderItem, int>, OrderItemRepository>();
 builder.Services.AddScoped<IBaseRepositoryWithInclude<CartItem, int>, CartItemRepository>();
 builder.Services.AddScoped<IStatisticsService, StatisticsService>();
+builder.Services.AddScoped<IReviewService, ReviewService>();
+builder.Services.AddScoped<IBaseRepository<Review, int>, ReviewRepository>();
 
 
 
@@ -175,6 +193,8 @@ if (app.Environment.IsDevelopment())
 
 app.UseStaticFiles(); // обязательно
 app.UseHttpsRedirection();
+app.UseRequestLocalization(app.Services.GetRequiredService<IOptions<RequestLocalizationOptions>>().Value);
+
 app.UseRouting();
 app.UseAuthentication();
 app.UseCors("AllowAll");

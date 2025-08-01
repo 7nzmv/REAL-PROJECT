@@ -1,4 +1,5 @@
 using System.ComponentModel.DataAnnotations;
+using System.Text.Json.Serialization;
 
 namespace Domain.Entities;
 
@@ -13,6 +14,20 @@ public class Product
     [MaxLength(500)]
     public string Description { get; set; } = null!;
 
+    // локализованные поля
+    [MaxLength(100)]
+    public string NameRu { get; set; } = null!;
+
+    [MaxLength(100)]
+    public string NameTg { get; set; } = null!;
+
+    [MaxLength(500)]
+    public string? DescriptionRu { get; set; }
+
+    [MaxLength(500)]
+    public string? DescriptionTg { get; set; }
+
+
     [Range(0.01, 1000000)]
     public decimal Price { get; set; }
 
@@ -25,4 +40,15 @@ public class Product
 
     public int CategoryId { get; set; }
     public Category Category { get; set; } = null!;
+
+    public int StockQuantity { get; set; }   // количество на складе
+
+
+    public bool IsInStock => StockQuantity > 0;   // вычисляемое поле
+
+
+    public double AverageRating { get; set; }   // средний рейтинг
+    
+
+    public List<Review> Reviews { get; set; } = new(); // отзывы
 }

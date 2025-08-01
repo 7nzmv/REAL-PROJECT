@@ -18,6 +18,11 @@
         },
         "runtime": {
           "WebApi.dll": {}
+        },
+        "resources": {
+          "tg/WebApi.resources.dll": {
+            "locale": "tg"
+          }
         }
       },
       "AutoMapper/12.0.1": {

@@ -4,7 +4,7 @@ using Domain.Enums;
 
 namespace Domain.Entities;
 
-public class Order 
+public class Order
 {
     [Key]
     public int Id { get; set; }
@@ -15,6 +15,9 @@ public class Order
     public decimal TotalPrice { get; set; }
 
     public OrderStatus Status { get; set; } = OrderStatus.Pending;  // enum: Pending, Paid, Shipped, Cancelled
+
+    public bool IsDeleted { get; set; } = false;
+    public DateTime? DeletedAt { get; set; }
 
     public ICollection<OrderItem> Items { get; set; } = new List<OrderItem>();
 }
